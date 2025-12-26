@@ -1,12 +1,18 @@
 #version 140
-
 in vec3 position;
-in vec3 color;      // our new attribute
-out vec3 vertex_color;
-
-// uniform mat4 matrix;
+in vec2 tex_coords;
+out vec2 v_tex_coords;
+uniform mat4 matrix;
+uniform vec3 cam_pos;
+uniform vec3 cam_rot;
 
 void main() {
-    vertex_color = color; // we need to set the value of each `out` variable.
-    gl_Position = /* matrix */ vec4(position, 1.0);
+    v_tex_coords = tex_coords;
+    // position = position - cam_pos;
+    vec3 sex = position - cam_pos;
+    float distace = sqrt(pow(sex.x, 2) + pow(sex.y, 2) + pow(sex.z, 2));
+    distace = sin(distace);
+
+    gl_Position = matrix * vec4(sex, 1.0);
+
 }

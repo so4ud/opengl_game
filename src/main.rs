@@ -1,5 +1,6 @@
 use glium;
 use glium::*;
+use image;
 
 fn main() {
     let event_loop = glium::winit::event_loop::EventLoop::builder()
@@ -9,29 +10,52 @@ fn main() {
         .with_title("kys >_<")
         .build(&event_loop);
 
-    #[derive(Copy, Clone)]
-    struct RenderReadyVertex {
-        position: [f32; 3],
-        color: [f32; 3],
-    }
-    implement_vertex!(RenderReadyVertex, position, color);
+    let image = image::load(
+        std::io::Cursor::new(&include_bytes!("sex.png")),
+        image::ImageFormat::Png,
+    )
+    .unwrap()
+    .to_rgba8();
+    let image_dimensions = image.dimensions();
+    let image =
+        glium::texture::RawImage2d::from_raw_rgba_reversed(&image.into_raw(), image_dimensions);
+    let texture = glium::Texture2d::new(&display, image).unwrap();
 
+    #[derive(Copy, Clone)]
+    struct Vertex {
+        position: [f32; 3],
+        tex_coords: [f32; 2],
+    }
+    implement_vertex!(Vertex, position, tex_coords);
+    // We've changed our shape to a rectangle so the image isn't distorted.
     let shape = vec![
-        RenderReadyVertex {
-            position: [-0.5, -0.5, 0.5],
-            color: [1.0, 0.0, 0.0],
+        Vertex {
+            position: [-0.5, -0.5, 0.0],
+            tex_coords: [0.0, 0.0],
         },
-        RenderReadyVertex {
-            position: [0.0, 0.5, 0.5],
-            color: [0.0, 1.0, 0.0],
+        Vertex {
+            position: [0.5, -0.5, 0.0],
+            tex_coords: [1.0, 0.0],
         },
-        RenderReadyVertex {
-            position: [0.5, -0.25, 0.5],
-            color: [0.0, 0.0, 1.0],
+        Vertex {
+            position: [0.5, 0.5, 0.0],
+            tex_coords: [1.0, 1.0],
+        },
+        Vertex {
+            position: [0.5, 0.5, 0.0],
+            tex_coords: [1.0, 1.0],
+        },
+        Vertex {
+            position: [-0.5, 0.5, 0.0],
+            tex_coords: [0.0, 1.0],
+        },
+        Vertex {
+            position: [-0.5, -0.5, 0.0],
+            tex_coords: [0.0, 0.0],
         },
     ];
-    let vertex_buffer = glium::VertexBuffer::new(&display, &shape).unwrap();
     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList);
+    let vertex_buffer = glium::VertexBuffer::new(&display, &shape).unwrap();
 
     let vertex_shader_src = include_str!("shaders\\vert.glsl");
     let fragment_shader_src = include_str!("shaders\\frag.glsl");
@@ -52,19 +76,24 @@ fn main() {
                     // We now need to render everyting in response to a RedrawRequested event due to the animation
                     glium::winit::event::WindowEvent::RedrawRequested => {
                         // we update `t`
-                        t += 0.02;
+                        t += 0.002;
                         let x = t.sin() * 0.5;
 
                         let mut target = display.draw();
-                        target.clear_color(0.15, 0.15, 0.15, 1.0);
+                        target.clear_color(0.0, 0.0, 1.0, 1.0);
+                        let cam_pos: [f32; 3] = [0.0 + x, 0.5, 0.5 + x];
+                        let cam_rot: [f32; 3] = [0.0, 0.0, 0.0];
 
                         let uniforms = uniform! {
                             matrix: [
                                 [1.0, 0.0, 0.0, 0.0],
                                 [0.0, 1.0, 0.0, 0.0],
                                 [0.0, 0.0, 1.0, 0.0],
-                                [  x, 0.0, 0.0, 1.0f32],
-                            ]
+                                [ 0.0, 0.0, 0.0, 1.0f32],
+                            ],
+                            tex: &texture,
+                            cam_pos: cam_pos,
+                            cam_rot: cam_rot,
                         };
 
                         target
