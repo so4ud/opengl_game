@@ -5,14 +5,40 @@ out vec2 v_tex_coords;
 uniform mat4 matrix;
 uniform vec3 cam_pos;
 uniform vec3 cam_rot;
+uniform float x;
+
+uniform mat3 r_mat_x;
+uniform mat3 r_mat_y;
+uniform mat3 r_mat_z;
+
+vec3 rotate3d(vec3 vertex, vec3 angles) {
+    // angles = radians(angles);
+    vec3 vec_1 = vec3(1, 0, 0);
+    vec3 vec_2 = vec3(0, cos(angles.x), -sin(angles.x));
+    vec3 vec_3 = vec3(0, sin(angles.x), cos(angles.x));
+    mat3 mat_x = mat3(vec_1, vec_2, vec_3);
+
+    vec_1 = vec3(cos(angles.y), 0, sin(angles.y));
+    vec_2 = vec3(0, 1, -sin(angles.y));
+    vec_3 = vec3(-sin(angles.y), 0, cos(angles.y));
+    mat3 mat_y = mat3(vec_1, vec_2, vec_3);
+
+    vec_1 = vec3(cos(angles.z), -sin(angles.z), 0);
+    vec_2 = vec3(sin(angles.z), cos(angles.z), 0);
+    vec_3 = vec3(0, 0, 1);
+    mat3 mat_z = mat3(vec_1, vec_2, vec_3);
+
+    return vertex * mat_x * mat_y * mat_z;
+}
 
 void main() {
     v_tex_coords = tex_coords;
     // position = position - cam_pos;
     vec3 sex = position - cam_pos;
+    sex = r_mat_x * r_mat_y * r_mat_z * (sex - vec3(0, 1, 0));
+    // sex = sex + vec3(0, -0.5, 0);
     float distace = sqrt(pow(sex.x, 2) + pow(sex.y, 2) + pow(sex.z, 2));
-    distace = sin(distace);
 
-    gl_Position = matrix * vec4(sex, 1.0);
+    gl_Position = matrix * vec4(sex, 1.0 * distace);
 
 }

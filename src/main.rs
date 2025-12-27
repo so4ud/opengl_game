@@ -30,27 +30,27 @@ fn main() {
     // We've changed our shape to a rectangle so the image isn't distorted.
     let shape = vec![
         Vertex {
-            position: [-0.5, -0.5, 0.0],
+            position: [49.5, 9.5, 0.0],
             tex_coords: [0.0, 0.0],
         },
         Vertex {
-            position: [0.5, -0.5, 0.0],
+            position: [50.5, 9.5, 0.0],
             tex_coords: [1.0, 0.0],
         },
         Vertex {
-            position: [0.5, 0.5, 0.0],
+            position: [50.5, 10.5, 0.0],
             tex_coords: [1.0, 1.0],
         },
         Vertex {
-            position: [0.5, 0.5, 0.0],
+            position: [50.5, 10.5, 0.0],
             tex_coords: [1.0, 1.0],
         },
         Vertex {
-            position: [-0.5, 0.5, 0.0],
+            position: [49.5, 10.5, 0.0],
             tex_coords: [0.0, 1.0],
         },
         Vertex {
-            position: [-0.5, -0.5, 0.0],
+            position: [49.5, 9.5, 0.0],
             tex_coords: [0.0, 0.0],
         },
     ];
@@ -76,13 +76,13 @@ fn main() {
                     // We now need to render everyting in response to a RedrawRequested event due to the animation
                     glium::winit::event::WindowEvent::RedrawRequested => {
                         // we update `t`
-                        t += 0.002;
+                        t += 0.0002;
                         let x = t.sin() * 0.5;
 
                         let mut target = display.draw();
                         target.clear_color(0.0, 0.0, 1.0, 1.0);
-                        let cam_pos: [f32; 3] = [0.0 + x, 0.5, 0.5 + x];
-                        let cam_rot: [f32; 3] = [0.0, 0.0, 0.0];
+                        let cam_pos: [f32; 3] = [50.0, 10.0, 0.0];
+                        let cam_rot: [f32; 3] = [t.sin() * 360.0, 0.0, 0.0];
 
                         let uniforms = uniform! {
                             matrix: [
@@ -93,7 +93,22 @@ fn main() {
                             ],
                             tex: &texture,
                             cam_pos: cam_pos,
-                            cam_rot: cam_rot,
+                            x: x,
+                            r_mat_x: [
+                                [1.0, 0.0, 0.0],
+                                [0.0, cam_rot[0].to_radians().cos(), -cam_rot[0].to_radians().sin()],
+                                [0.0,  cam_rot[0].to_radians().sin(), cam_rot[0].to_radians().cos()],
+                            ],
+                            r_mat_y: [
+                                [cam_rot[1].to_radians().cos(), 0.0, cam_rot[1].to_radians().sin()],
+                                [0.0, 1.0, 0.0],
+                                [-cam_rot[1].to_radians().sin(), 0.0, cam_rot[1].to_radians().cos()],
+                            ],
+                            r_mat_z: [
+                                [cam_rot[2].to_radians().cos(), -cam_rot[2].to_radians().sin(), 0.0],
+                                [cam_rot[2].to_radians().sin(), cam_rot[2].to_radians().cos(), 0.0],
+                                [0.0, 0.0, 1.0],
+                            ]
                         };
 
                         target
