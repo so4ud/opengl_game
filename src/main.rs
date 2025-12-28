@@ -2,6 +2,8 @@ use glium;
 use glium::*;
 use image;
 
+mod render;
+
 fn main() {
     let event_loop = glium::winit::event_loop::EventLoop::builder()
         .build()
@@ -21,35 +23,29 @@ fn main() {
         glium::texture::RawImage2d::from_raw_rgba_reversed(&image.into_raw(), image_dimensions);
     let texture = glium::Texture2d::new(&display, image).unwrap();
 
-    #[derive(Copy, Clone)]
-    struct Vertex {
-        position: [f32; 3],
-        tex_coords: [f32; 2],
-    }
-    implement_vertex!(Vertex, position, tex_coords);
     // We've changed our shape to a rectangle so the image isn't distorted.
     let shape = vec![
-        Vertex {
+        render::RenderReadyVertex {
             position: [49.5, 9.5, 0.0],
             tex_coords: [0.0, 0.0],
         },
-        Vertex {
+        render::RenderReadyVertex {
             position: [50.5, 9.5, 0.0],
             tex_coords: [1.0, 0.0],
         },
-        Vertex {
+        render::RenderReadyVertex {
             position: [50.5, 10.5, 0.0],
             tex_coords: [1.0, 1.0],
         },
-        Vertex {
+        render::RenderReadyVertex {
             position: [50.5, 10.5, 0.0],
             tex_coords: [1.0, 1.0],
         },
-        Vertex {
+        render::RenderReadyVertex {
             position: [49.5, 10.5, 0.0],
             tex_coords: [0.0, 1.0],
         },
-        Vertex {
+        render::RenderReadyVertex {
             position: [49.5, 9.5, 0.0],
             tex_coords: [0.0, 0.0],
         },
@@ -78,22 +74,23 @@ fn main() {
                         // we update `t`
                         t += 0.0002;
                         let x = t.sin() * 0.5;
+                        let y = t.sin() * 360.0 / 100.0;
 
                         let mut target = display.draw();
-                        target.clear_color(0.0, 0.0, 1.0, 1.0);
+                        target.clear_color(0.15, 0.15, 0.15, 1.0);
                         let cam_pos: [f32; 3] = [50.0, 10.0, 0.0];
-                        let cam_rot: [f32; 3] = [t.sin() * 360.0, 0.0, 0.0];
+                        let cam_rot: [f32; 3] = [t * 360.0, 0.0, 0.0];
 
                         let uniforms = uniform! {
                             matrix: [
                                 [1.0, 0.0, 0.0, 0.0],
                                 [0.0, 1.0, 0.0, 0.0],
                                 [0.0, 0.0, 1.0, 0.0],
-                                [ 0.0, 0.0, 0.0, 1.0f32],
+                                [ 0.0, 0.0, x, 1.0f32],
                             ],
                             tex: &texture,
                             cam_pos: cam_pos,
-                            x: x,
+                            x: y,
                             r_mat_x: [
                                 [1.0, 0.0, 0.0],
                                 [0.0, cam_rot[0].to_radians().cos(), -cam_rot[0].to_radians().sin()],
