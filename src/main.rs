@@ -1,6 +1,9 @@
+use cgmath::{Matrix3, Rad, vec3};
 use glium;
 use glium::*;
 use image;
+
+use crate::render::rotate3d;
 
 mod render;
 
