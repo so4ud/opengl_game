@@ -1,3 +1,5 @@
+use std::u16;
+
 use cgmath::{Matrix3, Rad, vec3};
 use glium;
 use glium::*;
@@ -7,7 +9,14 @@ use crate::render::rotate3d;
 
 mod render;
 
+mod file;
+
 fn main() {
+    let vertexes = vec![
+        render::Vertex::empty_w_pos(vec3(0.0, 0.0, 0.0)),
+        render::Vertex::empty_w_pos(vec3(0.0, 0.0, 0.0)),
+    ];
+
     let event_loop = glium::winit::event_loop::EventLoop::builder()
         .build()
         .expect("event loop building");

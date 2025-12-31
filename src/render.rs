@@ -1,4 +1,4 @@
-use cgmath::{self, Matrix3, Rad, Vector3};
+use cgmath::{self, Matrix3, Rad, Vector2, Vector3};
 use glium::*;
 
 #[derive(Copy, Clone)]
@@ -8,16 +8,25 @@ pub struct RenderReadyVertex {
 }
 implement_vertex!(RenderReadyVertex, position, tex_coords);
 
-struct Vertex {
-    position: Vector3<f32>,
+#[derive(Copy, Clone)]
+pub struct Camera {
+    pub fov: Vector2<f32>,
+    pub position: Vector3<f32>,
+    pub rotation: Vector3<f32>,
 }
 
-struct Triangle {
+#[derive(Copy, Clone)]
+pub struct Vertex {
+    pub position: Vector3<f32>,
+    pub tex_coords: [f32; 2],
+}
+
+pub struct Triangle {
     vertices: Vector3<Vertex>,
     normal: Vector3<f32>,
 }
 
-struct Mesh {
+pub struct Mesh {
     triangles: Vec<Triangle>,
     // one day it will be a texture but not today
     texture: u32,
@@ -42,6 +51,13 @@ impl Vertex {
         self.position = self.position + shift_by;
 
         return self;
+    }
+
+    pub fn empty_w_pos(pos: Vector3<f32>) -> Self {
+        Self {
+            position: pos,
+            tex_coords: [0.0, 0.0],
+        }
     }
 }
 
@@ -89,16 +105,16 @@ pub fn rotate3d(
 }
 
 // finish this idk, make like a negative shift ig
-pub fn prepare_vertecies(
-    cam_position: Vector3<f32>,
-    cam_rotation: Vector3<f32>,
-    mut mesh: Vec<Mesh>,
-) -> Vec<RenderReadyVertex> {
-    for i in mesh {
-        for x in i.triangles {
-            x.shift();
-        }
-    }
+// pub fn prepare_vertecies(
+//     cam_position: Vector3<f32>,
+//     cam_rotation: Vector3<f32>,
+//     mut mesh: Vec<Mesh>,
+// ) -> Vec<RenderReadyVertex> {
+//     for i in mesh {
+//         for x in i.triangles {
+//             x.shift();
+//         }
+//     }
 
-    return vec![RenderReadyVertex];
-}
+//     return vec![RenderReadyVertex];
+// }
