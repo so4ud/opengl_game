@@ -1,5 +1,5 @@
-use cgmath::{self, Matrix3, Rad, Vector2, Vector3};
-use glium::*;
+use cgmath::{self, Matrix3, Rad, Vector2, Vector3, vec2};
+use glium::implement_vertex;
 
 #[derive(Copy, Clone)]
 pub struct RenderReadyVertex {
@@ -8,11 +8,15 @@ pub struct RenderReadyVertex {
 }
 implement_vertex!(RenderReadyVertex, position, tex_coords);
 
+// maybe move to some other file cuz camera willbe used by both render and game
 #[derive(Copy, Clone)]
 pub struct Camera {
     pub fov: Vector2<f32>,
     pub position: Vector3<f32>,
     pub rotation: Vector3<f32>,
+    near_plane_distance: f32,
+    /// also known as rendering distance
+    far_plane_distance: f32,
 }
 
 #[derive(Copy, Clone)]
@@ -60,7 +64,25 @@ impl Vertex {
         }
     }
 }
-
+impl Camera {
+    pub fn new(
+        fov_x: f32,
+        position: Vector3<f32>,
+        rotation: Vector3<f32>,
+        near_plane_distance: f32,
+        far_plane_distance: f32,
+    ) -> Self {
+        let fov_y = (2.0 * (((fov_x * 0.5).to_radians()).tan() / (16.0 / 9.0)).atan()).to_degrees();
+        let fov = vec2(fov_x, fov_y);
+        Self {
+            fov,
+            position,
+            rotation,
+            near_plane_distance,
+            far_plane_distance,
+        }
+    }
+}
 impl Triangle {
     pub fn rotate(mut self, angles: Vector3<f32>, center: Vector3<f32>) -> Self {
         self.vertices.x = self.vertices.x.rotate(angles, center);
