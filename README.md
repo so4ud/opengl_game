@@ -1,5 +1,3 @@
-# opengl_game
-jnigga i need direction
 
 
 when convertinmg frrom normal to renderr ready swap x and z
