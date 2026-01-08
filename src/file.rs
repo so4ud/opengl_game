@@ -42,3 +42,17 @@ pub fn thing(vertexes: Vec<Vertex>, camera: Camera) -> Vec<RenderReadyVertex> {
         .map(|v| v.to_reader_ready(v.tex_coords))
         .collect()
 }
+
+///  implied angle is 90 degress
+fn shoulder_from(side: f32, angle: f32) -> f32 {
+    let a: f32;
+    let c = side;
+
+    // angles
+    let aang = angle;
+    let bang: f32 = 90.0;
+    let cang = 180.0 - bang - aang;
+
+    a = c * aang.to_radians().sin() / cang.to_radians().sin();
+    return a;
+}
